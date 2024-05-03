@@ -32,6 +32,7 @@ type DOMachineConfig struct {
 	SSHUser           string `json:"sshUser" yaml:"sshUser"`
 	Tags              string `json:"tags" yaml:"tags"`
 	Userdata          string `json:"userdata" yaml:"userdata"`
+	AccessToken       string `json:"accessToken" yaml:"accessToken"`
 }
 
 // NewDigitalOceanMachineConfig is a constructor to set up rke-machine-config.cattle.io.digitaloceanconfig. It returns an *unstructured.Unstructured
@@ -48,7 +49,7 @@ func NewDigitalOceanMachineConfig(generatedPoolName, namespace string) []unstruc
 		machineConfig.SetGenerateName(generatedPoolName)
 		machineConfig.SetNamespace(namespace)
 
-		machineConfig.Object["accessToken"] = ""
+		machineConfig.Object["accessToken"] = doMachineConfig.AccessToken
 		machineConfig.Object["image"] = doMachineConfig.Image
 		machineConfig.Object["backups"] = doMachineConfig.Backups
 		machineConfig.Object["ipv6"] = doMachineConfig.IPV6
