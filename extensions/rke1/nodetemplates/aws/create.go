@@ -3,6 +3,7 @@ package nodetemplates
 import (
 	"github.com/rancher/shepherd/clients/rancher"
 	management "github.com/rancher/shepherd/clients/rancher/generated/management/v3"
+	"github.com/rancher/shepherd/extensions/cloudcredentials"
 	"github.com/rancher/shepherd/extensions/cloudcredentials/aws"
 	"github.com/rancher/shepherd/extensions/rke1/nodetemplates"
 	"github.com/rancher/shepherd/pkg/config"
@@ -16,7 +17,7 @@ func CreateAWSNodeTemplate(rancherClient *rancher.Client) (*nodetemplates.NodeTe
 	var amazonEC2NodeTemplateConfig nodetemplates.AmazonEC2NodeTemplateConfig
 	config.LoadConfig(nodetemplates.AmazonEC2NodeTemplateConfigurationFileKey, &amazonEC2NodeTemplateConfig)
 
-	cloudCredential, err := aws.CreateAWSCloudCredentials(rancherClient)
+	cloudCredential, err := aws.CreateAWSCloudCredentials(rancherClient, cloudcredentials.CloudCredential{})
 	if err != nil {
 		return nil, err
 	}

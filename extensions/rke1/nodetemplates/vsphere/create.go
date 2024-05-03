@@ -3,6 +3,7 @@ package nodetemplates
 import (
 	"github.com/rancher/shepherd/clients/rancher"
 	management "github.com/rancher/shepherd/clients/rancher/generated/management/v3"
+	"github.com/rancher/shepherd/extensions/cloudcredentials"
 	"github.com/rancher/shepherd/extensions/cloudcredentials/vsphere"
 	"github.com/rancher/shepherd/extensions/rke1/nodetemplates"
 	"github.com/rancher/shepherd/pkg/config"
@@ -16,7 +17,7 @@ func CreateVSphereNodeTemplate(rancherClient *rancher.Client) (*nodetemplates.No
 	var vmwarevsphereNodeTemplateConfig nodetemplates.VmwareVsphereNodeTemplateConfig
 	config.LoadConfig(nodetemplates.VmwareVsphereNodeTemplateConfigurationFileKey, &vmwarevsphereNodeTemplateConfig)
 
-	cloudCredential, err := vsphere.CreateVsphereCloudCredentials(rancherClient)
+	cloudCredential, err := vsphere.CreateVsphereCloudCredentials(rancherClient, cloudcredentials.CloudCredential{})
 	if err != nil {
 		return nil, err
 	}

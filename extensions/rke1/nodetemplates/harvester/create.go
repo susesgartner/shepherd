@@ -3,6 +3,7 @@ package nodetemplates
 import (
 	"github.com/rancher/shepherd/clients/rancher"
 	management "github.com/rancher/shepherd/clients/rancher/generated/management/v3"
+	"github.com/rancher/shepherd/extensions/cloudcredentials"
 	"github.com/rancher/shepherd/extensions/cloudcredentials/harvester"
 	"github.com/rancher/shepherd/extensions/rke1/nodetemplates"
 	"github.com/rancher/shepherd/pkg/config"
@@ -16,7 +17,7 @@ func CreateHarvesterNodeTemplate(rancherClient *rancher.Client) (*nodetemplates.
 	var harvesterNodeTemplateConfig nodetemplates.HarvesterNodeTemplateConfig
 	config.LoadConfig(nodetemplates.HarvesterNodeTemplateConfigurationFileKey, &harvesterNodeTemplateConfig)
 
-	cloudCredential, err := harvester.CreateHarvesterCloudCredentials(rancherClient)
+	cloudCredential, err := harvester.CreateHarvesterCloudCredentials(rancherClient, cloudcredentials.CloudCredential{})
 	if err != nil {
 		return nil, err
 	}

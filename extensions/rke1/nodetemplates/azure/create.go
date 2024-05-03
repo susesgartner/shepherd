@@ -3,6 +3,7 @@ package nodetemplates
 import (
 	"github.com/rancher/shepherd/clients/rancher"
 	management "github.com/rancher/shepherd/clients/rancher/generated/management/v3"
+	"github.com/rancher/shepherd/extensions/cloudcredentials"
 	"github.com/rancher/shepherd/extensions/cloudcredentials/azure"
 	"github.com/rancher/shepherd/extensions/rke1/nodetemplates"
 	"github.com/rancher/shepherd/pkg/config"
@@ -16,7 +17,7 @@ func CreateAzureNodeTemplate(rancherClient *rancher.Client) (*nodetemplates.Node
 	var azureNodeTemplateConfig nodetemplates.AzureNodeTemplateConfig
 	config.LoadConfig(nodetemplates.AzureNodeTemplateConfigurationFileKey, &azureNodeTemplateConfig)
 
-	cloudCredential, err := azure.CreateAzureCloudCredentials(rancherClient)
+	cloudCredential, err := azure.CreateAzureCloudCredentials(rancherClient, cloudcredentials.CloudCredential{})
 	if err != nil {
 		return nil, err
 	}

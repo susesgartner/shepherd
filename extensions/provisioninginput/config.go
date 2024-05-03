@@ -207,6 +207,7 @@ type Config struct {
 	K3SKubernetesVersions  []string                                 `json:"k3sKubernetesVersion,omitempty" yaml:"k3sKubernetesVersion,omitempty"`
 	RKE1KubernetesVersions []string                                 `json:"rke1KubernetesVersion,omitempty" yaml:"rke1KubernetesVersion,omitempty"`
 	RKE2KubernetesVersions []string                                 `json:"rke2KubernetesVersion,omitempty" yaml:"rke2KubernetesVersion,omitempty"`
+	KubernetesVersion      string                                   `json:"kubernetesVersion,omitempty" yaml:"kubernetesVersion,omitempty"`
 	CNIs                   []string                                 `json:"cni,omitempty" yaml:"cni,omitempty"`
 	PSACT                  string                                   `json:"psact,omitempty" yaml:"psact,omitempty"`
 	PNI                    bool                                     `json:"pni,omitempty" yaml:"pni,omitempty"`

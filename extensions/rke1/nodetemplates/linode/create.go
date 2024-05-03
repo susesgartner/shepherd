@@ -3,6 +3,7 @@ package nodetemplates
 import (
 	"github.com/rancher/shepherd/clients/rancher"
 	management "github.com/rancher/shepherd/clients/rancher/generated/management/v3"
+	"github.com/rancher/shepherd/extensions/cloudcredentials"
 	"github.com/rancher/shepherd/extensions/cloudcredentials/linode"
 	"github.com/rancher/shepherd/extensions/rke1/nodetemplates"
 	"github.com/rancher/shepherd/pkg/config"
@@ -16,7 +17,7 @@ func CreateLinodeNodeTemplate(rancherClient *rancher.Client) (*nodetemplates.Nod
 	var linodeNodeTemplateConfig nodetemplates.LinodeNodeTemplateConfig
 	config.LoadConfig(nodetemplates.LinodeNodeTemplateConfigurationFileKey, &linodeNodeTemplateConfig)
 
-	cloudCredential, err := linode.CreateLinodeCloudCredentials(rancherClient)
+	cloudCredential, err := linode.CreateLinodeCloudCredentials(rancherClient, cloudcredentials.CloudCredential{})
 	if err != nil {
 		return nil, err
 	}
