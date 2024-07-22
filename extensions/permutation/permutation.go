@@ -2,8 +2,6 @@ package permutation
 
 import (
 	"encoding/json"
-	"errors"
-	"maps"
 	"os"
 
 	"sigs.k8s.io/yaml"
@@ -38,7 +36,7 @@ func CreatePermutation(keyPath []string, keyPathValues []any, keyPathValueRelati
 	}
 }
 
-func Permute(permutations []PermutationObject, baseConfig map[string]any) (permutedConfigs []map[string]any, permuteName string, err error) {
+func Permute(permutations []Permutation, baseConfig map[string]any) (permutedConfigs []map[string]any, permuteName string, err error) {
 	var configs []map[string]any
 	for _, keyPathValue := range permutations[0].KeyPathValues {
 		marshaledConfig, err := json.Marshal(baseConfig)
@@ -109,7 +107,8 @@ func ReplaceValue(keyPath []string, replaceVal any, searchMap map[string]any) (m
 	return searchMap, nil
 }
 
-func LoadConfigFromFile(filePath string) (map[string]any, error) {
+// LoadConfigFromFile loads an entire yaml file into a map[string]any
+func LoadConfigFromFile(filePath string) map[string]any {
 	allString, err := os.ReadFile(filePath)
 	if err != nil {
 		panic(err)
@@ -121,37 +120,22 @@ func LoadConfigFromFile(filePath string) (map[string]any, error) {
 		panic(err)
 	}
 
-	return all, nil
+	return all
 }
 
-func LoadConfigFromMap(key string, configMap map[string]any, config interface{}) {
-	scoped := configMap[key]
-	scopedString, err := yaml.Marshal(scoped)
+// LoadKeyFromMap loads a specific key from a map[string]any
+func LoadKeyFromMap(key string, config map[string]any) map[string]any {
+	keyConfig := config[key]
+	scopedString, err := yaml.Marshal(keyConfig)
 	if err != nil {
 		panic(err)
 	}
 
-	err = yaml.Unmarshal(scopedString, config)
+	var scopedMap map[string]any
+	err = yaml.Unmarshal(scopedString, &scopedMap)
 	if err != nil {
 		panic(err)
 	}
-}
 
-// TODO move this to another file as this function is modular
-func LoadDefaults(filePath string, overrideConfig map[string]any) (map[string]any, error) {
-	if filePath == "" {
-		yaml.Unmarshal([]byte("{}"), filePath)
-		err := errors.New("No default file found")
-		return nil, err
-	}
-
-	config, err := LoadConfigFromFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	//Override the default values with any provided values
-	maps.Copy(overrideConfig, config)
-
-	return config, nil
+	return scopedMap
 }
