@@ -31,9 +31,9 @@ type HarvesterMachineConfig struct {
 
 // NewHarvesterMachineConfig is a constructor to set up rke-machine-config.cattle.io.harvesterconfig.
 // It returns an *unstructured.Unstructured that CreateMachineConfig uses to created the rke-machine-config
-func NewHarvesterMachineConfig(generatedPoolName, namespace string) []unstructured.Unstructured {
+func NewHarvesterMachineConfig(machineConfig map[string]any, generatedPoolName, namespace string) []unstructured.Unstructured {
 	var harvesterMachineConfigs HarvesterMachineConfigs
-	config.LoadConfig(HarvesterMachineConfigConfigurationFileKey, &harvesterMachineConfigs)
+	config.LoadObjectFromMap(HarvesterMachineConfigConfigurationFileKey, machineConfig, &harvesterMachineConfigs)
 	var multiConfig []unstructured.Unstructured
 
 	for _, harvesterMachineConfig := range harvesterMachineConfigs.HarvesterMachineConfig {

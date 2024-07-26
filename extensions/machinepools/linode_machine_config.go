@@ -37,9 +37,9 @@ type LinodeMachineConfig struct {
 
 // NewLinodeMachineConfig is a constructor to set up rke-machine-config.cattle.io.linodeconfigs. It returns an *unstructured.Unstructured
 // that CreateMachineConfig uses to created the rke-machine-config
-func NewLinodeMachineConfig(generatedPoolName, namespace string) []unstructured.Unstructured {
+func NewLinodeMachineConfig(machineConfig map[string]any, generatedPoolName, namespace string) []unstructured.Unstructured {
 	var linodeMachineConfigs LinodeMachineConfigs
-	config.LoadConfig(LinodeMachineConfigConfigurationFileKey, &linodeMachineConfigs)
+	config.LoadObjectFromMap(LinodeMachineConfigConfigurationFileKey, machineConfig, &linodeMachineConfigs)
 	var multiConfig []unstructured.Unstructured
 
 	for _, linodeMachineConfig := range linodeMachineConfigs.LinodeMachineConfig {

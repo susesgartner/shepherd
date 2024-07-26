@@ -54,9 +54,9 @@ type VmwarevsphereMachineConfig struct {
 
 // NewVSphereMachineConfig is a constructor to set up rke-machine-config.cattle.io.vmwarevsphereconfig. It returns an *unstructured.Unstructured
 // that CreateMachineConfig uses to created the rke-machine-config
-func NewVSphereMachineConfig(generatedPoolName, namespace string) []unstructured.Unstructured {
+func NewVSphereMachineConfig(machineConfig map[string]any, generatedPoolName, namespace string) []unstructured.Unstructured {
 	var vmwarevsphereMachineConfigs VmwarevsphereMachineConfigs
-	config.LoadConfig(VmwarevsphereMachineConfigConfigurationFileKey, &vmwarevsphereMachineConfigs)
+	config.LoadObjectFromMap(VmwarevsphereMachineConfigConfigurationFileKey, machineConfig, &vmwarevsphereMachineConfigs)
 	var multiConfig []unstructured.Unstructured
 
 	for _, vsphereMachineConfig := range vmwarevsphereMachineConfigs.VmwarevsphereMachineConfig {

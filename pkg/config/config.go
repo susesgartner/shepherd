@@ -119,3 +119,49 @@ func WriteConfig(key string, config interface{}) error {
 
 	return nil
 }
+
+// LoadConfigFromFile loads an entire yaml file into a map[string]any
+func LoadConfigFromFile(filePath string) map[string]any {
+	allString, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	var all map[string]any
+	err = yaml.Unmarshal(allString, &all)
+	if err != nil {
+		panic(err)
+	}
+
+	return all
+}
+
+// LoadKeyFromMap loads a specific key from a map[string]any
+func LoadKeyFromMap(key string, config map[string]any) map[string]any {
+	keyConfig := config[key]
+	scopedString, err := yaml.Marshal(keyConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	var scopedMap map[string]any
+	err = yaml.Unmarshal(scopedString, &scopedMap)
+	if err != nil {
+		panic(err)
+	}
+
+	return scopedMap
+}
+
+func LoadObjectFromMap(key string, config map[string]any, object any) {
+	keyConfig := config[key]
+	scopedString, err := yaml.Marshal(keyConfig)
+	if err != nil {
+		panic(err)
+	}
+
+	err = yaml.Unmarshal(scopedString, &object)
+	if err != nil {
+		panic(err)
+	}
+}

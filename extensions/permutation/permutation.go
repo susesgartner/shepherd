@@ -2,23 +2,24 @@ package permutation
 
 import (
 	"encoding/json"
-	"os"
-
-	"sigs.k8s.io/yaml"
+	"errors"
+	"fmt"
 )
 
 // Relationship structs are used to connect related key/values together so that they can be permuted in sync
 type Relationship struct {
-	ParentValue       any      `json:"parentValue" yaml:"parentValue"`
-	ChildKeyPath      []string `json:"childKeyPath" yaml:"childkeyPath"`
-	ChildKeyPathValue any      `json:"childKeyPathValue" yaml:"childkeyPathValue"`
+	ParentValue       any           `json:"parentValue" yaml:"parentValue"`
+	ChildKeyPath      []string      `json:"childKeyPath" yaml:"childkeyPath"`
+	ChildKeyPathValue any           `json:"childKeyPathValue" yaml:"childkeyPathValue"`
+	ChildPermutations []Permutation `json:"childPermutations" yaml:"childPermutations"`
 }
 
-func CreateRelationship(parentValue any, childKeyPath []string, childKeyPathValue any) Relationship {
+func CreateRelationship(parentValue any, childKeyPath []string, childKeyPathValue any, childPermutations []Permutation) Relationship {
 	return Relationship{
 		ParentValue:       parentValue,
 		ChildKeyPath:      childKeyPath,
 		ChildKeyPathValue: childKeyPathValue,
+		ChildPermutations: childPermutations,
 	}
 }
 
@@ -36,8 +37,13 @@ func CreatePermutation(keyPath []string, keyPathValues []any, keyPathValueRelati
 	}
 }
 
-func Permute(permutations []Permutation, baseConfig map[string]any) (permutedConfigs []map[string]any, permuteName string, err error) {
+func Permute(permutations []Permutation, baseConfig map[string]any) ([]map[string]any, string, error) {
 	var configs []map[string]any
+	var err error
+	if len(permutations) == 0 {
+		return configs, "", err
+	}
+
 	for _, keyPathValue := range permutations[0].KeyPathValues {
 		marshaledConfig, err := json.Marshal(baseConfig)
 		if err != nil {
@@ -52,16 +58,31 @@ func Permute(permutations []Permutation, baseConfig map[string]any) (permutedCon
 			return nil, "", err
 		}
 
+		subPermutations := false
 		for _, relationship := range permutations[0].KeyPathValueRelationships {
 			if relationship.ParentValue == keyPathValue {
-				permutedConfig, err = ReplaceValue(relationship.ChildKeyPath, relationship.ChildKeyPathValue, permutedConfig)
-				if err != nil {
-					return nil, "", err
+				if len(relationship.ChildKeyPath) > 1 && relationship.ChildKeyPathValue != nil {
+					permutedConfig, err = ReplaceValue(relationship.ChildKeyPath, relationship.ChildKeyPathValue, permutedConfig)
+					if err != nil {
+						return nil, "", err
+					}
 				}
+
+				var relationshipPermutedConfigs []map[string]any
+				if len(relationship.ChildPermutations) > 0 {
+					subPermutations = true
+					relationshipPermutedConfigs, _, err = Permute(relationship.ChildPermutations, permutedConfig)
+					if err != nil {
+						return nil, "", err
+					}
+				}
+				configs = append(configs, relationshipPermutedConfigs...)
 			}
 		}
 
-		configs = append(configs, permutedConfig)
+		if !subPermutations {
+			configs = append(configs, permutedConfig)
+		}
 	}
 
 	var finalConfigs []map[string]any
@@ -82,7 +103,7 @@ func Permute(permutations []Permutation, baseConfig map[string]any) (permutedCon
 }
 
 func ReplaceValue(keyPath []string, replaceVal any, searchMap map[string]any) (map[string]any, error) {
-	if len(keyPath) == 1 {
+	if len(keyPath) <= 1 {
 		searchMap[keyPath[0]] = replaceVal
 
 		return searchMap, nil
@@ -107,35 +128,30 @@ func ReplaceValue(keyPath []string, replaceVal any, searchMap map[string]any) (m
 	return searchMap, nil
 }
 
-// LoadConfigFromFile loads an entire yaml file into a map[string]any
-func LoadConfigFromFile(filePath string) map[string]any {
-	allString, err := os.ReadFile(filePath)
-	if err != nil {
-		panic(err)
+func GetKeyPathValue(keyPath []string, searchMap map[string]any) (any, error) {
+	var err error
+	var keypathvalues any
+	if len(keyPath) == 1 {
+		keypathvalues, ok := searchMap[keyPath[0]]
+		if !ok {
+			err = errors.New(fmt.Sprintf("expected key does not exist: %s", keyPath[0]))
+		}
+		return keypathvalues, err
+	} else {
+		if _, ok := searchMap[keyPath[0]].(map[string]any); ok {
+			keypathvalues, err = GetKeyPathValue(keyPath[1:], searchMap[keyPath[0]].(map[string]any))
+			if err != nil {
+				return nil, err
+			}
+		} else if _, ok := searchMap[keyPath[0]].([]any); ok {
+			for i := range searchMap[keyPath[0]].([]any) {
+				keypathvalues, err = GetKeyPathValue(keyPath[1:], searchMap[keyPath[0]].([]any)[i].(map[string]any))
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
 	}
 
-	var all map[string]any
-	err = yaml.Unmarshal(allString, &all)
-	if err != nil {
-		panic(err)
-	}
-
-	return all
-}
-
-// LoadKeyFromMap loads a specific key from a map[string]any
-func LoadKeyFromMap(key string, config map[string]any) map[string]any {
-	keyConfig := config[key]
-	scopedString, err := yaml.Marshal(keyConfig)
-	if err != nil {
-		panic(err)
-	}
-
-	var scopedMap map[string]any
-	err = yaml.Unmarshal(scopedString, &scopedMap)
-	if err != nil {
-		panic(err)
-	}
-
-	return scopedMap
+	return keypathvalues, err
 }

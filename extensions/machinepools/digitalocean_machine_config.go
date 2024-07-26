@@ -37,9 +37,9 @@ type DOMachineConfig struct {
 
 // NewDigitalOceanMachineConfig is a constructor to set up rke-machine-config.cattle.io.digitaloceanconfig. It returns an *unstructured.Unstructured
 // that CreateMachineConfig uses to created the rke-machine-config
-func NewDigitalOceanMachineConfig(generatedPoolName, namespace string) []unstructured.Unstructured {
+func NewDigitalOceanMachineConfig(machineConfig map[string]any, generatedPoolName, namespace string) []unstructured.Unstructured {
 	var doMachineConfigs DOMachineConfigs
-	config.LoadConfig(DOMachineConfigConfigurationFileKey, &doMachineConfigs)
+	config.LoadObjectFromMap(DOMachineConfigConfigurationFileKey, machineConfig, &doMachineConfigs)
 	var multiConfig []unstructured.Unstructured
 
 	for _, doMachineConfig := range doMachineConfigs.DOMachineConfig {
