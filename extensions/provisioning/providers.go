@@ -25,7 +25,7 @@ import (
 )
 
 type CloudCredFunc func(rancherClient *rancher.Client, credentials cloudcredentials.CloudCredential) (*v1.SteveAPIObject, error)
-type MachinePoolFunc func(generatedPoolName, namespace string) []unstructured.Unstructured
+type MachinePoolFunc func(machineConfig map[string]any, generatedPoolName, namespace string) []unstructured.Unstructured
 
 type Provider struct {
 	Name                               provisioninginput.ProviderName

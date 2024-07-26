@@ -47,6 +47,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	kwait "k8s.io/apimachinery/pkg/util/wait"
 
 	management "github.com/rancher/shepherd/clients/rancher/generated/management/v3"
@@ -66,7 +67,7 @@ const (
 )
 
 // CreateProvisioningCluster provisions a non-rke1 cluster, then runs verify checks
-func CreateProvisioningCluster(client *rancher.Client, provider Provider, clustersConfig *clusters.ClusterConfig, hostnameTruncation []machinepools.HostnameTruncation) (*v1.SteveAPIObject, error) {
+func CreateProvisioningCluster(client *rancher.Client, provider Provider, clustersConfig *clusters.ClusterConfig, machinePoolConfigs []unstructured.Unstructured, clusterName string, hostnameTruncation []machinepools.HostnameTruncation) (*v1.SteveAPIObject, error) {
 	credentialSpec := cloudcredentials.LoadCloudCredential(string(provider.Name))
 	cloudCredential, err := provider.CloudCredFunc(client, credentialSpec)
 	if err != nil {
@@ -79,10 +80,6 @@ func CreateProvisioningCluster(client *rancher.Client, provider Provider, cluste
 			return nil, err
 		}
 	}
-
-	clusterName := namegen.AppendRandomString(provider.Name.String())
-	generatedPoolName := fmt.Sprintf("nc-%s-pool1-", clusterName)
-	machinePoolConfigs := provider.MachinePoolFunc(generatedPoolName, namespace)
 
 	var machinePoolResponses []v1.SteveAPIObject
 

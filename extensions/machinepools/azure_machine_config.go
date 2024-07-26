@@ -45,9 +45,9 @@ type AzureMachineConfig struct {
 
 // NewAzureMachineConfig is a constructor to set up rke-machine-config.cattle.io.azureconfig. It returns an *unstructured.Unstructured
 // that CreateMachineConfig uses to created the rke-machine-config
-func NewAzureMachineConfig(generatedPoolName, namespace string) []unstructured.Unstructured {
+func NewAzureMachineConfig(machineConfig map[string]any, generatedPoolName, namespace string) []unstructured.Unstructured {
 	var azureMachineConfigs AzureMachineConfigs
-	config.LoadConfig(AzureMachineConfigConfigurationFileKey, &azureMachineConfigs)
+	config.LoadObjectFromMap(AzureMachineConfigConfigurationFileKey, machineConfig, &azureMachineConfigs)
 	var multiConfig []unstructured.Unstructured
 
 	for _, azureMachineConfig := range azureMachineConfigs.AzureMachineConfig {

@@ -35,9 +35,9 @@ type AWSMachineConfig struct {
 
 // NewAWSMachineConfig is a constructor to set up rke-machine-config.cattle.io.amazonec2config. It returns an *unstructured.Unstructured
 // that CreateMachineConfig uses to created the rke-machine-config
-func NewAWSMachineConfig(generatedPoolName, namespace string) []unstructured.Unstructured {
+func NewAWSMachineConfig(machineConfig map[string]any, generatedPoolName, namespace string) []unstructured.Unstructured {
 	var awsMachineConfigs AWSMachineConfigs
-	config.LoadConfig(AWSMachineConfigConfigurationFileKey, &awsMachineConfigs)
+	config.LoadObjectFromMap(AWSMachineConfigConfigurationFileKey, machineConfig, &awsMachineConfigs)
 	var multiConfig []unstructured.Unstructured
 
 	for _, awsMachineConfig := range awsMachineConfigs.AWSMachineConfig {
