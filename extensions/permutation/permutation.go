@@ -2,8 +2,8 @@ package permutation
 
 import (
 	"encoding/json"
-
-	"github.com/sirupsen/logrus"
+	"errors"
+	"fmt"
 )
 
 // Relationship structs are used to connect related key/values together so that they can be permuted in sync
@@ -77,7 +77,6 @@ func Permute(permutations []Permutation, baseConfig map[string]any) ([]map[strin
 					}
 				}
 				configs = append(configs, relationshipPermutedConfigs...)
-				logrus.Info(len(configs))
 			}
 		}
 
@@ -133,8 +132,11 @@ func GetKeyPathValue(keyPath []string, searchMap map[string]any) (any, error) {
 	var err error
 	var keypathvalues any
 	if len(keyPath) == 1 {
-		keypathvalues := searchMap[keyPath[0]]
-		return keypathvalues, nil
+		keypathvalues, ok := searchMap[keyPath[0]]
+		if !ok {
+			err = errors.New(fmt.Sprintf("expected key does not exist: %s", keyPath[0]))
+		}
+		return keypathvalues, err
 	} else {
 		if _, ok := searchMap[keyPath[0]].(map[string]any); ok {
 			keypathvalues, err = GetKeyPathValue(keyPath[1:], searchMap[keyPath[0]].(map[string]any))
