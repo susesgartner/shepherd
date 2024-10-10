@@ -130,7 +130,7 @@ func CreateRKE1Cluster(client *rancher.Client, rke1Cluster *management.Cluster) 
 		return nil, err
 	}
 
-	err = kwait.Poll(500*time.Millisecond, 2*time.Minute, func() (done bool, err error) {
+	err = kwait.PollUntilContextTimeout(context.TODO(), 1*time.Second, 5*time.Minute, true, func(ctx context.Context) (done bool, err error) {
 		client, err = client.ReLogin()
 		if err != nil {
 			return false, err
@@ -142,7 +142,6 @@ func CreateRKE1Cluster(client *rancher.Client, rke1Cluster *management.Cluster) 
 		}
 		return true, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +196,7 @@ func CreateK3SRKE2Cluster(client *rancher.Client, rke2Cluster *apisV1.Cluster) (
 		return nil, err
 	}
 
-	err = kwait.Poll(500*time.Millisecond, 2*time.Minute, func() (done bool, err error) {
+	err = kwait.PollUntilContextTimeout(context.TODO(), 1*time.Second, defaults.TenMinuteTimeout, true, func(ctx context.Context) (done bool, err error) {
 		client, err = client.ReLogin()
 		if err != nil {
 			return false, err
@@ -564,7 +563,7 @@ func GetProvisioningClusterByName(client *rancher.Client, clusterName string, na
 // WaitForActiveCluster is a "helper" function that waits for the cluster to reach the active state.
 // The function accepts a Rancher client and a cluster ID as parameters.
 func WaitForActiveRKE1Cluster(client *rancher.Client, clusterID string) error {
-	err := kwait.Poll(500*time.Millisecond, 30*time.Minute, func() (done bool, err error) {
+	err := kwait.PollUntilContextTimeout(context.TODO(), 1*time.Second, 30*time.Minute, true, func(ctx context.Context) (done bool, err error) {
 		client, err = client.ReLogin()
 		if err != nil {
 			return false, err
