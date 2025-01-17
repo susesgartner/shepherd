@@ -102,6 +102,7 @@ func (n *Node) ExecuteCommand(command string) (string, error) {
 		User:            n.SSHUser,
 		Auth:            auths,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Timeout:         0,
 	}
 	cfg.SetDefaults()
 
