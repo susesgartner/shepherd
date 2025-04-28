@@ -216,6 +216,11 @@ func CreateK3SRKE2Cluster(client *rancher.Client, rke2Cluster *apisV1.Cluster) (
 	}
 
 	client.Session.RegisterCleanupFunc(func() error {
+		cluster, err = client.Steve.SteveType(ProvisioningSteveResourceType).ByID(cluster.ID)
+		if err != nil {
+			return err
+		}
+
 		adminClient, err := rancher.NewClient(client.RancherConfig.AdminToken, client.Session)
 		if err != nil {
 			return err
