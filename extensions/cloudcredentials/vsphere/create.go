@@ -6,6 +6,7 @@ import (
 	"github.com/rancher/shepherd/extensions/cloudcredentials"
 	"github.com/rancher/shepherd/extensions/defaults"
 	"github.com/rancher/shepherd/extensions/defaults/namespaces"
+	"github.com/rancher/shepherd/extensions/defaults/providers"
 	"github.com/rancher/shepherd/extensions/defaults/stevestates"
 	"github.com/rancher/shepherd/extensions/defaults/stevetypes"
 	"github.com/rancher/shepherd/extensions/steve"
@@ -16,13 +17,12 @@ import (
 )
 
 const (
-	vsphereProvider = "vsphere"
-	localCluster    = "local"
+	localCluster = "local"
 )
 
 // CreateVsphereCloudCredentials is a helper function that creates V1 cloud credentials and waits for them to become active.
 func CreateVsphereCloudCredentials(client *rancher.Client, credentials cloudcredentials.CloudCredential) (*v1.SteveAPIObject, error) {
-	secretName := namegenerator.AppendRandomString(vsphereProvider)
+	secretName := namegenerator.AppendRandomString(providers.Vsphere)
 	spec := corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			GenerateName: cloudcredentials.GeneratedName,
@@ -33,10 +33,10 @@ func CreateVsphereCloudCredentials(client *rancher.Client, credentials cloudcred
 			},
 		},
 		Data: map[string][]byte{
-			"vmwarevspherecredentialConfig-password":    []byte(credentials.VmwareVsphereConfig.Password),
-			"vmwarevspherecredentialConfig-username":    []byte(credentials.VmwareVsphereConfig.Username),
-			"vmwarevspherecredentialConfig-vcenter":     []byte(credentials.VmwareVsphereConfig.Vcenter),
-			"vmwarevspherecredentialConfig-vcenterPort": []byte(credentials.VmwareVsphereConfig.VcenterPort),
+			"vmwarevspherecredentialConfig-password":    []byte(credentials.VSphereCredentialConfig.Password),
+			"vmwarevspherecredentialConfig-username":    []byte(credentials.VSphereCredentialConfig.Username),
+			"vmwarevspherecredentialConfig-vcenter":     []byte(credentials.VSphereCredentialConfig.Vcenter),
+			"vmwarevspherecredentialConfig-vcenterPort": []byte(credentials.VSphereCredentialConfig.VcenterPort),
 		},
 		Type: corev1.SecretTypeOpaque,
 	}
@@ -51,9 +51,9 @@ func CreateVsphereCloudCredentials(client *rancher.Client, credentials cloudcred
 
 // GetVspherePassword is a helper to get the password from the cloud credential object as a string
 func GetVspherePassword() string {
-	var vmwarevsphereCredentialConfig cloudcredentials.VmwarevsphereCredentialConfig
+	var vmwarevsphereCredentialConfig cloudcredentials.VSphereCredentialConfig
 
-	config.LoadConfig(cloudcredentials.VmwarevsphereCredentialConfigurationFileKey, &vmwarevsphereCredentialConfig)
+	config.LoadConfig(cloudcredentials.VSphereCredentialConfigurationFileKey, &vmwarevsphereCredentialConfig)
 
 	return vmwarevsphereCredentialConfig.Password
 }

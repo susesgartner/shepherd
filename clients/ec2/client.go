@@ -39,7 +39,7 @@ func NewClient() (*Client, error) {
 }
 
 // NewClientFromConfig generates a new ec2 client using the provided credentials
-func NewClientFromConfig(awsCredentials *cloudcredentials.AmazonEC2CredentialConfig) (*Client, error) {
+func NewClientFromConfig(awsCredentials *cloudcredentials.AmazonCredentialConfig) (*Client, error) {
 	credential := credentials.NewStaticCredentials(awsCredentials.AccessKey, awsCredentials.SecretKey, "")
 	ec2Session, err := session.NewSession(&aws.Config{
 		Credentials: credential,

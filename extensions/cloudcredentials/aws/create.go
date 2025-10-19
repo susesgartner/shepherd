@@ -33,9 +33,9 @@ func CreateAWSCloudCredentials(client *rancher.Client, credentials cloudcredenti
 			},
 		},
 		Data: map[string][]byte{
-			"amazonec2credentialConfig-accessKey":     []byte(credentials.AmazonEC2CredentialConfig.AccessKey),
-			"amazonec2credentialConfig-secretKey":     []byte(credentials.AmazonEC2CredentialConfig.SecretKey),
-			"amazonec2credentialConfig-defaultRegion": []byte(credentials.AmazonEC2CredentialConfig.DefaultRegion),
+			"amazonec2credentialConfig-accessKey":     []byte(credentials.AmazonCredentialConfig.AccessKey),
+			"amazonec2credentialConfig-secretKey":     []byte(credentials.AmazonCredentialConfig.SecretKey),
+			"amazonec2credentialConfig-defaultRegion": []byte(credentials.AmazonCredentialConfig.DefaultRegion),
 		},
 		Type: corev1.SecretTypeOpaque,
 	}
